@@ -16,7 +16,7 @@ print("Index loaded:", index.ntotal)
 
 model = INSTRUCTOR('hkunlp/instructor-base')
 instruction = "Represent the question for retrieving relevant documents"
-query = "What is "
+query = "Tell some news that happend on may 13 2025"
 query_embedding = model.encode([[instruction, query]])[0]
 
 
@@ -46,27 +46,45 @@ for doc in retrieved_chunks:
     
 
 
-prompt = f"""
-Use the following context to answer the question.
-
-Context:
-{context}
-
-Question:
+prompt = f"""<|system|>
+You are a helpful assistant that answers questions based on the provided context.
+Use ALL the provided sources to answer the question.
+If multiple perspectives exist, include them.
+Don't start with half words.
+Don't skip anything in the end.</s>
+<|user|>
 {query}
 
-Answer:
-"""
+Context:
+{context}</s>
+<|assistant|>"""
 
 from langchain_huggingface import HuggingFacePipeline
 from transformers import pipeline
 
 pipe = pipeline(
     "text-generation",
-    model="TinyLlama/TinyLlama-1.1B-Chat-v0.6",
+    model="modgeek/tinyllama-rag-finetuned",
     device=0  # 0 = GPU, -1 = CPU
 )
+
+
+# Load model directly
+# from transformers import AutoModel
+# model = AutoModel.from_pretrained("microsoft/Phi-3-mini-4k-instruct", dtype="auto")
 
 llm = HuggingFacePipeline(pipeline=pipe)
 
 print(llm.invoke(prompt))
+
+
+# Load model directly
+# from huggingface_hub import snapshot_download
+
+# # Downloads entire model to local folder
+# snapshot_download(
+#     repo_id="modgeek/tinyllama-rag-finetuned",
+#     local_dir="./tinyllama-rag-finetuned"
+# )
+
+# print("Model downloaded!")

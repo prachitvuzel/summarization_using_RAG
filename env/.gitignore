@@ -21,3 +21,4 @@ vector_db.index
 scrape.py
 finetuning_dataset_the_guardian.jsonl
 finetuning_dataset_wikipedia.jsonl
+tinyllama-rag-finetuned
